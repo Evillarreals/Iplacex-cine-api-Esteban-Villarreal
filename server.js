@@ -3,6 +3,7 @@ import cors from  'cors'
 
 import client from './src/common/db.js'
 import peliculaRoutes from './src/pelicula/routes.js'
+import actorRoutes from './src/actor/routes.js'
 
 const PORTS = 3000 || 4000
 const app = express()
@@ -13,7 +14,8 @@ app.use(cors())
 
 app.get('/',(req, res) => { return res.status(200).send('bienvenido al cine') })
 
-app.use('/api', peliculaRoutes )
+app.use('/api', peliculaRoutes)
+app.use('/api', actorRoutes)
 
 await client.connect()
 .then(() =>{

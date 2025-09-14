@@ -35,7 +35,7 @@ async function handleGetPeliculaByIdRequest(req, res) {
 
         await peliculaCollection.findOne({ _id: oid })
         .then((data) => {
-            if(data ===null) return res.status(404).send(data) 
+            if(data === null) return res.status(404).send(data) 
 
             return res.status(200).send(data)
         })
