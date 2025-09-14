@@ -1,9 +1,30 @@
-import { ObjectId } from "mongodb";
+import { ObjectId, ReturnDocument } from "mongodb";
 import client from "../common/db.js";
 import { Actor } from "./actor.js"
 
 const actorCollection = client.db('cine-db').collection('actor')
+const peliculaCollection = client.db('cine-db').collection('peliculas')
 
+async function handleInsertActorRequest(req, res) {
+    let data = req.body
+    let actor = Actor
+
+    await peliculaCollection.findOne({ nombre: data.nombrePelicula})
+    .then (async (pelicula) => {
+        if (pelicula === null) return res.status(404).send("Pelicula no existe")
+
+    actor.idPelicula = String(pelicula._id)
+    actor.nombre = data.nombre
+    actor.edad = data.edad
+    actor.estaRetirado = data.estaRetirado
+    actor.premios = data.premios
+
+    await actorCollection.insertOne(actor)
+    .then((data) => res.status(201).send(data))
+    .catch((e) => res.status(500).send({error : e }))
+    })
+    .catch((e) => res.status(500).send({error: e}))  
+}
 
 async function handleGetActoresRequest(req,res) {
     await actorCollection.find({}).toArray()
@@ -11,7 +32,7 @@ async function handleGetActoresRequest(req,res) {
     .catch((e) => { return res.status(500).send({error: e}) })
 }
 
-async function handleGetActorByIdRequest (rew, res) {
+async function handleGetActorByIdRequest (req, res) {
     let id = req.params.id
 
     try {
@@ -32,7 +53,30 @@ async function handleGetActorByIdRequest (rew, res) {
     }
 }
 
+async function handleGetActoresByPeliculaIdRequest(req, res) {
+    let id = req.params.pelicula
+
+    try {
+
+        let oid = ObjectId.createFromHexString(id)
+
+        await peliculaCollection.findOne({ _id: oid })
+        .then(async (pelicula) => {
+            if(pelicula === null) return res.status(404).send("pelicula no existe")
+            
+            await actorCollection.find({ idPelicula: id }).toArray()
+            .then((data) => res.status(200).send(data))
+            .catch((e) => res.status(500).send({ error:e }))
+        })
+    }
+    catch(e){
+        return res.status(400).send({ error: e })
+    }
+}
+
 export default {
+    handleInsertActorRequest,
     handleGetActoresRequest,
     handleGetActorByIdRequest,
+    handleGetActoresByPeliculaIdRequest
 }

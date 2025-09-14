@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(urlencoded({ extended: true }))
 app.use(cors())
 
-app.get('/',(req, res) => { return res.status(200).send('bienvenido al cine') })
+app.get('/',(req, res) => { return res.status(200).send('Bienvenido al cine Iplacex') })
 
 app.use('/api', peliculaRoutes)
 app.use('/api', actorRoutes)
