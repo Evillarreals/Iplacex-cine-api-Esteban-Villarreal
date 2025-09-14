@@ -2,6 +2,7 @@ import express, { urlencoded } from 'express'
 import cors from  'cors'
 
 import client from './src/common/db.js'
+import peliculaRoutes from './src/pelicula/routes.js'
 
 const PORTS = 3000 || 4000
 const app = express()
@@ -11,6 +12,8 @@ app.use(urlencoded({ extended: true }))
 app.use(cors())
 
 app.get('/',(req, res) => { return res.status(200).send('bienvenido al cine') })
+
+app.use('/api', peliculaRoutes )
 
 await client.connect()
 .then(() =>{
